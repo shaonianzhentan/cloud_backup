@@ -30,15 +30,20 @@ class SimpleConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             # validate
-            access_key = user_input.get('access_key')
-            secret_key = user_input.get('secret_key')
-            bucket_name = user_input.get('bucket_name')
+            access_key = user_input.get('access_key').strip()
+            secret_key = user_input.get('secret_key').strip()
+            bucket_name = user_input.get('bucket_name').strip()
             qn = Qiniu(access_key, secret_key, bucket_name)
-            qn.get_list()
-            errors['base'] = 'fail'
+            validated = await self.hass.async_add_executor_job(qn.validate)
+            if validated == False:
+                errors['base'] = 'fail'
 
             # validate success
             if errors.get('base', '') == '':
-                return self.async_create_entry(title=DOMAIN, data=user_input)
+                return self.async_create_entry(title=DOMAIN, data={
+                    'access_key': access_key,
+                    'secret_key': secret_key,
+                    'bucket_name': bucket_name
+                })
 
         return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA, errors=errors)

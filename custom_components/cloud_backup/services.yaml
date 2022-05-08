@@ -1,0 +1,3 @@
+create:
+  name: 创建备份
+  description: 创建一个新备份并上传到七牛云

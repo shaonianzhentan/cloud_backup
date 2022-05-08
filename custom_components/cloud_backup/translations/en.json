@@ -3,7 +3,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "七牛云存储，每月免费10GB存储，千万别充钱，注册地址：https://s.qiniu.com/Efuu6f",
+                "description": "七牛云存储，每月免费10GB存储，千万别充钱 \n注册地址：https://s.qiniu.com/Efuu6f",
                 "data": {
                     "access_key": "Access Key",
                     "secret_key": "Secret Key",

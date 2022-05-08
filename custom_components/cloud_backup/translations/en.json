@@ -1,0 +1,21 @@
+{
+    "title": "云备份",
+    "config": {
+        "step": {
+            "user": {
+                "description": "七牛云存储，每月免费10GB存储，千万别充钱，注册地址：https://s.qiniu.com/Efuu6f",
+                "data": {
+                    "access_key": "Access Key",
+                    "secret_key": "Secret Key",
+                    "bucket_name": "Bucket Name"
+                }
+            }
+        },
+        "error": {
+            "fail": "信息验证失败"
+        },
+        "abort": {
+            "single_instance_allowed": "不能重复添加"
+        }
+    }
+}

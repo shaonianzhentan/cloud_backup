@@ -28,20 +28,22 @@ class Qiniu():
         '''
         return eof
 
+    def notify(self, hass, title, message):
+        hass.services.call('persistent_notification', 'create', {
+            'title': title,
+            'message': message,
+            'notification_id': 'cloud_backup'
+        })
+
     def upload(self, localfile, hass):
         if self.in_process:
-            print('uploading...')
+            self.notify(hass, '云备份', '正在上传中...')
             return
-        print('start uploading')
+        self.notify(hass, '云备份', '开始上传文件到云端')
         self.in_process = True
         key = self.prefix + os.path.basename(localfile)
         token = self.auth.upload_token(self.bucket_name, key, 3600)
         res = qiniu.put_file(token, key, localfile)
         print(res)
-        print('upload success')
         self.in_process = False
-        hass.services.call('persistent_notification', 'create', {
-            'title': '云备份文件上传成功',
-            'message': f'文件路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={self.bucket_name}" target="_blank">{key}</a>',
-            'notification_id': 'cloud_backup'
-        })
+        self.notify(hass, '文件上传成功', f'路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={self.bucket_name}" target="_blank">{key}</a>')

@@ -17,6 +17,19 @@
 
 ## 使用
 
+新建一个自动化，在YAML模式中贴入以下内容
+```yaml
+alias: 自动备份
+description: '每天晚上3点，自动备份文件到本地，同时上传到云端'
+mode: single
+trigger:
+  - platform: time
+    at: '03:00:00'
+condition: []
+action:
+  - service: cloud_backup.create
+    data: {}
+```
 
 ## 如果这个项目对你有帮助，请我喝杯<del style="font-size: 14px;">咖啡</del>奶茶吧😘
 |  |支付宝|微信|

@@ -21,6 +21,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     async def async_handle_create_service(call) -> None:
         """Service handler for creating backups."""
+        qiniu.notify(hass, '本地备份', '正在生成备份文件，请耐心等待')
         backup_manager = hass.data[BACKUP_DOMAIN]
         backup = await backup_manager.generate_backup()
         _thread.start_new_thread(qiniu.upload, (backup.path, hass))

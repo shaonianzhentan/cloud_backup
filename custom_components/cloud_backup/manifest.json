@@ -1,7 +1,7 @@
 {
   "domain": "cloud_backup",
   "name": "\u4E91\u5907\u4EFD",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "config_flow": true,
   "documentation": "https://github.com/shaonianzhentan/cloud_backup",
   "requirements": [

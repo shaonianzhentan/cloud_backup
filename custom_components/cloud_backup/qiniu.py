@@ -1,4 +1,4 @@
-import qiniu, uuid, os
+import qiniu, uuid, os, asyncio
 from homeassistant.const import __version__ as current_version
 
 # 获取本机MAC地址
@@ -8,7 +8,8 @@ def get_mac_address_key():
 
 class Qiniu():
 
-    def __init__(self, access_key, secret_key, bucket_name):
+    def __init__(self, hass, access_key, secret_key, bucket_name):
+        self.hass = hass
         self.auth = qiniu.Auth(access_key, secret_key)
         self.bucket_name = bucket_name
         self.prefix = f'HomeAssistant/{get_mac_address_key()}/{current_version}/'
@@ -28,22 +29,28 @@ class Qiniu():
         '''
         return eof
 
-    def notify(self, hass, title, message):
-        hass.services.call('persistent_notification', 'create', {
+    def notify(self, title, message):
+        self.hass.services.call('persistent_notification', 'create', {
             'title': title,
             'message': message,
             'notification_id': 'cloud_backup'
         })
 
-    def upload(self, localfile, hass):
+    def upload(self, localfile):
         if self.in_process:
-            self.notify(hass, '云备份', '正在上传中...')
+            self.notify('云备份', '正在上传中...')
             return
-        self.notify(hass, '云备份', '开始上传文件到云端')
+        self.notify('云备份', '开始上传文件到云端')
         self.in_process = True
         key = self.prefix + os.path.basename(localfile)
         token = self.auth.upload_token(self.bucket_name, key, 3600)
         res = qiniu.put_file(token, key, localfile)
         print(res)
         self.in_process = False
-        self.notify(hass, '文件上传成功', f'路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={self.bucket_name}" target="_blank">{key}</a>')
+        self.notify('文件上传成功', f'路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={self.bucket_name}" target="_blank">{key}</a>')
+
+    # Execute asynchronous functions
+    def create_task(self, tasks):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(asyncio.gather(*tasks))

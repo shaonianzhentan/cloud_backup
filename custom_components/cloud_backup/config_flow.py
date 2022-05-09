@@ -33,7 +33,7 @@ class SimpleConfigFlow(ConfigFlow, domain=DOMAIN):
             access_key = user_input.get('access_key').strip()
             secret_key = user_input.get('secret_key').strip()
             bucket_name = user_input.get('bucket_name').strip()
-            qn = Qiniu(access_key, secret_key, bucket_name)
+            qn = Qiniu(self.hass, access_key, secret_key, bucket_name)
             validated = await self.hass.async_add_executor_job(qn.validate)
             if validated == False:
                 errors['base'] = 'fail'

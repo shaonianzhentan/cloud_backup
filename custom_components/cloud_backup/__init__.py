@@ -19,19 +19,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     bucket_name = data.get('bucket_name')
     qiniu = Qiniu(hass, access_key, secret_key, bucket_name)
 
-    # backup and upload
-    async def backup_upload():
+    async def async_handle_create_service(call):
         backup_manager = hass.data[BACKUP_DOMAIN]
         if backup_manager.backing_up:
+            qiniu.notify('本地备份', '正在进行中')
             return
-        qiniu.notify(hass, '本地备份', '正在生成备份文件，请耐心等待')
-        backup = await backup_manager.generate_backup()
-        qiniu.upload(backup.path)
+        _thread.start_new_thread(qiniu.generate_backup, (backup_manager,))
 
-    def handle_create_service(call):
-        _thread.start_new_thread(qiniu.create_task, ([backup_upload()],))
-
-    hass.services.register(DOMAIN, "create", handle_create_service)
+    hass.services.async_register(DOMAIN, "create", async_handle_create_service)
     
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     return True

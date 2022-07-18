@@ -3,10 +3,6 @@
 
 [![hacs_badge](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-
-![forks](https://img.shields.io/github/forks/shaonianzhentan/cloud_backup)
-![stars](https://img.shields.io/github/stars/shaonianzhentan/cloud_backup)
-![license](https://img.shields.io/github/license/shaonianzhentan/cloud_backup)
 ![visit](https://visitor-badge.laobi.icu/badge?page_id=shaonianzhentan.cloud_backup&left_text=visit)
 
 ## 安装

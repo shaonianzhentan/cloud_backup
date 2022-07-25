@@ -17,27 +17,22 @@ class Qiniu():
         self.bucket_name = bucket_name
         self.prefix = f'HomeAssistant/{get_mac_address_key()}/{HAVERSION}/'
         self.in_process = False
-
-    def validate(self) -> bool:
-        bucket = qiniu.BucketManager(self.auth)
-        limit = 1
-        marker = None
-        delimiter = None
-        ret, eof, info = bucket.list(self.bucket_name, self.prefix, marker, limit, delimiter)
-        '''
-        print('========')
-        print(ret)
-        print(eof)
+    
+    # 上传
+    async def upload_file(self, localfile):
+        key = self.prefix + os.path.basename(localfile)
+        token = self.auth.upload_token(self.bucket_name, key, 3600)
+        res = await self.hass.async_add_executor_job(self.qiniu.put_file, token, key, localfile)
+        print(res)
+    
+    # 删除
+    async def delete(self, key):
+        bucket = self.qiniu.BucketManager(self.auth)
+        ret, info = await self.hass.async_add_executor_job(bucket.delete, self.bucket_name, key)
         print(info)
-        '''
-        return eof
 
-    def notify(self, message):
-        self.hass.services.call('persistent_notification', 'create', {
-            'title': '云备份',
-            'message': message,
-            'notification_id': 'cloud_backup'
-        })
+    async def notify(self, message):
+        await self.hass.services.async_call('persistent_notification', 'create', {"message": message, "title": "云备份", "notification_id": "cloud_backup"})
 
     '''
     root_path: 压缩目录
@@ -75,11 +70,11 @@ class Qiniu():
                         zip.write(file_path, file_name)
         return zf
 
-    async def upload(self, call):
+    async def async_upload(self, call):
         data = call.data
 
         if self.in_process:
-            self.notify('正在上传中...')
+            await self.notify('正在上传中...')
             return
 
         self.in_process = True
@@ -100,7 +95,7 @@ class Qiniu():
         filter_name = [
             'node_modules', '__pycache__', '.npm'
         ]
-        self.notify('开始压缩上传备份文件')
+        await self.notify('开始压缩上传备份文件')
         root_path = self.hass.config.path('./')
         localfile = self.zip(root_path,
             f"_{HAVERSION}_{int(time.time())}.zip",
@@ -108,10 +103,8 @@ class Qiniu():
             filter_name,
             f'{root_path}backups/')
 
-        self.notify('开始上传文件到云端')
-        key = self.prefix + os.path.basename(localfile)
-        token = self.auth.upload_token(self.bucket_name, key, 3600)
-        res = qiniu.put_file(token, key, localfile)
-        print(res)
+        await self.notify('开始上传文件到云端')
+        self.upload_file(localfile)
+        print('上传成功')
         self.in_process = False
-        self.notify(f'文件上传成功\n\n路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={self.bucket_name}" target="_blank">{key}</a>')
+        await self.notify(f'文件上传成功\n\n路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={self.bucket_name}" target="_blank">{key}</a>')

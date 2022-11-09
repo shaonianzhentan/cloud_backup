@@ -1,3 +1,10 @@
 create:
-  name: 创建备份
+  name: Create
   description: 创建一个新备份并上传到七牛云
+  fields:
+    delete:
+      name: Delete
+      description: 上传完成后，删除本地备份文件
+      example: True
+      selector:
+        boolean:

@@ -1,20 +1,19 @@
 import os
 from homeassistant.util.json import load_json
 
+CURRENT_PATH = os.path.dirname(__file__)
+
 class Manifest():
 
-    def __init__(self, domain):
-        self.domain = domain
-        self.manifest_path = self.custom_components_path(f'{domain}/manifest.json')
+    def __init__(self):
+        self.manifest_path = f'{CURRENT_PATH}/manifest.json'
         self.update()
 
-    def custom_components_path(self, file_path):
-        return os.path.abspath('./custom_components/' + file_path)
-
     def update(self):
-        data = load_json(self.manifest_path)
+        data = load_json(self.manifest_path, {})
+        self.domain = data.get('domain')
         self.name = data.get('name')
         self.version = data.get('version')
         self.documentation = data.get('documentation')
 
-manifest = Manifest('cloud_backup')
+manifest = Manifest()

@@ -1,4 +1,3 @@
-import _thread, asyncio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 import homeassistant.helpers.config_validation as cv
@@ -18,8 +17,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     bucket_name = data.get('bucket_name')
     qiniu = Qiniu(hass, access_key, secret_key, bucket_name)
 
-    hass.services.async_register(DOMAIN, "create", qiniu.upload)
-    
+    async def async_handle_service(call):
+        backup_manager = hass.data['backup']
+        if backup_manager.backing_up == False:
+            backup = await backup_manager.generate_backup()
+            print(backup.path)
+            key = await hass.async_add_executor_job(qiniu.upload, backup.path)
+            print(key)
+            hass.loop.create_task(hass.services.async_call('persistent_notification', 'create', {
+                'title': '文件上传成功',
+                'message': f'路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={qiniu.bucket_name}" target="_blank">{key}</a>',
+                'notification_id': 'cloud_backup'
+            }))
+
+    hass.services.async_register(DOMAIN, "create", async_handle_service)
+
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     return True
 

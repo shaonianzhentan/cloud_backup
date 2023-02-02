@@ -21,9 +21,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         backup_manager = hass.data['backup']
         if backup_manager.backing_up == False:
             backup = await backup_manager.generate_backup()
-            print(backup.path)
+            # print(backup.path)
             key = await hass.async_add_executor_job(qiniu.upload, backup.path)
-            print(key)
+            # print(key)
             hass.loop.create_task(hass.services.async_call('persistent_notification', 'create', {
                 'title': '文件上传成功',
                 'message': f'路径：<a href="https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName={qiniu.bucket_name}" target="_blank">{key}</a>',
@@ -34,7 +34,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 hass.loop.create_task(backup_manager.remove_backup(backup.slug))
 
     hass.services.async_register(DOMAIN, "create", async_handle_service)
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

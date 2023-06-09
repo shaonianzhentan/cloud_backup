@@ -1,10 +1,9 @@
 import qiniu, uuid, os
 from homeassistant.const import __version__ as current_version
+from homeassistant.util.json import load_json
+from homeassistant.helpers.storage import STORAGE_DIR
 
-# 获取本机MAC地址
-def get_mac_address_key(): 
-    mac=uuid.UUID(int = uuid.getnode()).hex[-12:] 
-    return "".join([mac[e:e+2] for e in range(0,11,2)])
+HA_UUID = load_json(os.path.abspath(f'{STORAGE_DIR}/core.uuid'))['data']['uuid']
 
 class Qiniu():
 
@@ -12,7 +11,7 @@ class Qiniu():
         self.hass = hass
         self.auth = qiniu.Auth(access_key, secret_key)
         self.bucket_name = bucket_name
-        self.prefix = f'HomeAssistant/{get_mac_address_key()}/{current_version}/'
+        self.prefix = f'HomeAssistant/{HA_UUID}/{current_version}/'
         self.in_process = False
 
     def validate(self) -> bool:

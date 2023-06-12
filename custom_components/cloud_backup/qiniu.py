@@ -1,4 +1,4 @@
-import qiniu, uuid, os
+import qiniu, time, os
 from homeassistant.const import __version__ as current_version
 from homeassistant.util.json import load_json
 from homeassistant.helpers.storage import STORAGE_DIR
@@ -29,7 +29,8 @@ class Qiniu():
         return eof
 
     def upload(self, localfile):
-        key = self.prefix + os.path.basename(localfile)
+        today = time.strftime('%y_%m_%d_', time.localtime(time.time()))
+        key = self.prefix + today + os.path.basename(localfile)
         token = self.auth.upload_token(self.bucket_name, key, 3600)
         res = qiniu.put_file(token, key, localfile)
         return res[0]['key']

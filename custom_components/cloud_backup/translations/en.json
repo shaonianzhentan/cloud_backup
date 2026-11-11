@@ -9,6 +9,11 @@
                     "secret_key": "Secret Key",
                     "bucket_name": "Bucket Name"
                 }
+            },
+            "init": {
+                "data": {
+                    "delete_local": "上传后删除本地备份"
+                }
             }
         },
         "error": {
@@ -16,6 +21,15 @@
         },
         "abort": {
             "single_instance_allowed": "不能重复添加"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "delete_local": "上传后删除本地备份"
+                }
+            }
         }
     }
 }

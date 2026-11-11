@@ -1,10 +1,10 @@
 create:
   name: Create
-  description: 创建一个新备份并上传到七牛云
+  description: 创建 Home Assistant 系统备份，上传到七牛云，并按配置删除本地备份
   fields:
     delete:
       name: Delete
-      description: 上传完成后，删除本地备份文件
-      example: True
+      description: 上传完成后，删除本地备份文件（覆盖集成配置中的“上传后删除本地备份”选项）
+      example: true
       selector:
         boolean:

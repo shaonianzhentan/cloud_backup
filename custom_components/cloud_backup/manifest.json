@@ -1,7 +1,7 @@
 {
   "domain": "cloud_backup",
   "name": "\u4E91\u5907\u4EFD",
-  "version": "2025.1.0",
+  "version": "2026.11.11",
   "config_flow": true,
   "iot_class": "cloud_push",
   "homeassistant": "2025.1.0",
